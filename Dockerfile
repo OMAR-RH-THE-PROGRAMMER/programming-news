@@ -18,10 +18,14 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# انسخ الـ entrypoint واجعله executable
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# الحل النهائي للـ APP_KEY: أنشئ .env دايماً، انسخ من example لو موجود، ثم generate key
+RUN touch .env
+RUN cp .env.example .env || true
+RUN php artisan key:generate --force
+
+# صلاحيات عامة (عشان storage وcache)
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8000
 
-CMD ["/entrypoint.sh"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
