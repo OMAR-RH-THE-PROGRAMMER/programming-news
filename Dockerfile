@@ -1,4 +1,4 @@
-FROM php:8.3-cli
+FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -8,23 +8,28 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+RUN a2enmod rewrite
+
 WORKDIR /var/www/html
 
-COPY . .
+COPY . /var/www/html
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# الحل الرئيسي: copy .env.example إلى .env وgenerate key
-RUN cp .env.example .env || true
-RUN php artisan key:generate --force --no-interaction
+# .env setup (robust، هيعمل حتى لو .env.example مش موجود)
+RUN cp .env.example .env 2>/dev/null || echo "" > .env
+RUN php artisan key:generate --force --no-interaction || true
 
-# صلاحيات عامة (كويسة للـ storage)
-RUN chmod -R 777 storage bootstrap/cache
+# صلاحيات Laravel
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-EXPOSE 8000
+# غيّر document root إلى public/ (مهم لـ Laravel)
+RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+EXPOSE 80
