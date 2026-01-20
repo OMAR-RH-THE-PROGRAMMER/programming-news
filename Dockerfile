@@ -18,9 +18,19 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-RUN chown -R www-data:www-data storage bootstrap/cache
+# أنشئ .env أساسي (بدون copy من example، عشان مستقل)
+RUN touch .env
+RUN echo "APP_NAME='Programming News'" >> .env
+RUN echo "APP_ENV=local" >> .env
+RUN echo "APP_DEBUG=true" >> .env
+RUN echo "APP_URL=http://localhost:8000" >> .env
+RUN echo "DB_CONNECTION=sqlite" >> .env  # اختياري، لو مفيش DB حقيقي
 
-RUN php artisan key:generate --no-interaction || true
+# توليد الـ encryption key (أهم حاجة عشان ميطلعش 500 error)
+RUN php artisan key:generate --force --no-interaction
+
+# صلاحيات Laravel
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8000
 
