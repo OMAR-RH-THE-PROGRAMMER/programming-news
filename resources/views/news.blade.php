@@ -42,13 +42,13 @@ html, body {
 
 /* slow cosmic movement */
 #stars {
-  animation: drift 220s linear infinite;
+  animation: drift 450s linear infinite;
 }
 #stars2 {
-  animation: drift 320s linear infinite;
+  animation: drift 150s linear infinite;
 }
 #stars3 {
-  animation: drift 420s linear infinite;
+  animation: drift 450s linear infinite;
 }
 
 @keyframes drift {
@@ -267,21 +267,21 @@ function createStars(containerId, count, sizeRange) {
     const star = document.createElement('div');
     star.className = 'star';
 
-    const size = Math.random() * sizeRange + 0.5;
+    const size = Math.random() * sizeRange + 2;
     star.style.width = size + 'px';
     star.style.height = size + 'px';
 
     star.style.top = Math.random() * 200 + '%';
     star.style.left = Math.random() * 100 + '%';
 
-    star.style.animationDelay = Math.random() * 6 + 's';
+    star.style.animationDelay = Math.random() * 10 + 's';
 
     container.appendChild(star);
   }
 }
-createStars('stars', 400, 2);
-createStars('stars2', 300, 3);
-createStars('stars3', 200, 4);
+createStars('stars', 500, 2);
+createStars('stars2', 500, 3);
+createStars('stars3', 500, 4);
 
 </script>
 
