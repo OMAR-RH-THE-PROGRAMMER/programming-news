@@ -1,9 +1,0 @@
-node_modules
-vendor
-.git
-.github
-.env
-.env.example
-storage/*.key
-storage/logs/*
-bootstrap/cache/*
