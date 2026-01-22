@@ -14,8 +14,9 @@ class NewsController extends Controller
         'pageSize' => 12,
     ]);
 
-    $articles = collect($response->json()['articles'])
-        ->filter(fn($a) => $a['urlToImage']);
+    $articles = collect($response->json()['articles'] ?? [])
+    ->filter(fn($a) => $a['urlToImage']);
+
 
     return view('news', compact('articles'));
 }
